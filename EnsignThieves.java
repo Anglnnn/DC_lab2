@@ -17,25 +17,20 @@ public class EnsignThieves {
     public static List<Ensign> ensigns = new ArrayList<>();
 
     public static void main(String[] args) {
-        // Create a blocking queue to store the stolen weapons
         BlockingQueue<Weapon> stolenWeaponQueue = new LinkedBlockingQueue<>();
 
-        // Initialize the weapons queue
         for (int i = 1; i <= NUM_WEAPONS; i++) {
             stolenWeaponQueue.add(new Weapon("Weapon", new Random().nextInt(100)));
         }
 
-        // Create a list to store the ensigns
         ensigns.add(new Ensign("Ivanov", stolenWeaponQueue, "weapon"));
         ensigns.add(new Ensign("Petrov", stolenWeaponQueue, "truck"));
         ensigns.add(new Ensign("Nechiporchuk", stolenWeaponQueue, "value"));
 
-        // Start all the ensigns working
         for (Ensign ensign : ensigns) {
             ensign.start();
         }
 
-        // Wait for all the ensigns to finish working
         for (Ensign ensign : ensigns) {
             try {
                 ensign.join();
@@ -44,7 +39,6 @@ public class EnsignThieves {
             }
         }
 
-        // Print the total value of the stolen weapons
         System.out.println("The total value of the stolen weapons is: " + totalValue);
     }
 
@@ -80,12 +74,9 @@ public class EnsignThieves {
 
         @Override
         public void run() {
-            // Acquire the lock
             lock.lock();
 
-            // While the weapons queue is not empty, perform the appropriate action for the next weapon in the queue.
             while (!stolenWeaponQueue.isEmpty()) {
-                // Get the next weapon from the queue
                 Weapon weapon = null;
                 try {
                     weapon = stolenWeaponQueue.take();
@@ -93,22 +84,17 @@ public class EnsignThieves {
                     throw new RuntimeException(e);
                 }
 
-                // Determine the ensign to perform the action
                 Ensign ensign = ensigns.get(ensignIndex);
                 ensignIndex = (ensignIndex + 1) % ensigns.size();
 
-                // Perform the appropriate action based on the range of responsibility
                 switch (ensign.rangeOfResponsibility) {
                     case "weapon":
-                        // Take the weapon from the warehouse
                         System.out.println("Ensign " + ensign.name + " took weapon "  + "from warehouse.");
                         break;
                     case "truck":
-                        // Load the weapon into the truck
                         System.out.println("Ensign " + ensign.name + " loaded weapon " +  "into the truck.");
                         break;
                     case "value":
-                        // Calculate the value of the weapon
                         System.out.println("Ensign " + ensign.name + " calculated the value of weapon " + "to be " + weapon.getValue() + "." + "\n");
                         totalValue += weapon.getValue();
                         break;
@@ -117,7 +103,6 @@ public class EnsignThieves {
 
             }
 
-            // Release the lock
             lock.unlock();
         }
     }
